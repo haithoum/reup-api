@@ -1,0 +1,258 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+final class Version20260102000412 extends AbstractMigration
+{
+    public function getDescription(): string
+    {
+        return '';
+    }
+
+    public function up(Schema $schema): void
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SEQUENCE audit_logs_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE cities_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE citizen_merchant_wallets_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE citizen_profiles_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE coupons_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE deposits_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE merchant_categories_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE merchant_profiles_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE notifications_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE pro_profiles_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE recoveries_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE refresh_tokens_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE reward_rules_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE stock_history_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE stocks_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE users_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE valorization_transactions_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE wallet_transactions_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE audit_logs (id BIGINT NOT NULL, user_id BIGINT DEFAULT NULL, action VARCHAR(50) NOT NULL, entity_type VARCHAR(100) DEFAULT NULL, entity_id BIGINT DEFAULT NULL, old_values JSON DEFAULT NULL, new_values JSON DEFAULT NULL, ip_address VARCHAR(45) DEFAULT NULL, user_agent TEXT DEFAULT NULL, request_id UUID DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX idx_audit_logs_user_id ON audit_logs (user_id)');
+        $this->addSql('CREATE INDEX idx_audit_logs_entity_type_id ON audit_logs (entity_type, entity_id)');
+        $this->addSql('CREATE INDEX idx_audit_logs_created_at ON audit_logs (created_at)');
+        $this->addSql('CREATE INDEX idx_audit_logs_request_id ON audit_logs (request_id)');
+        $this->addSql('CREATE TABLE cities (id BIGINT NOT NULL, name VARCHAR(255) NOT NULL, postal_code VARCHAR(10) NOT NULL, region VARCHAR(255) DEFAULT NULL, country_code VARCHAR(2) DEFAULT \'FR\' NOT NULL, latitude NUMERIC(10, 8) DEFAULT NULL, longitude NUMERIC(11, 8) DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX idx_cities_postal_code ON cities (postal_code)');
+        $this->addSql('CREATE INDEX idx_cities_name ON cities (name)');
+        $this->addSql('CREATE UNIQUE INDEX unique_city_postal ON cities (name, postal_code)');
+        $this->addSql('CREATE TABLE citizen_merchant_wallets (id BIGINT NOT NULL, citizen_user_id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, kg_credit NUMERIC(10, 2) DEFAULT \'0\' NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX idx_wallets_citizen_user_id ON citizen_merchant_wallets (citizen_user_id)');
+        $this->addSql('CREATE INDEX idx_wallets_merchant_user_id ON citizen_merchant_wallets (merchant_user_id)');
+        $this->addSql('CREATE UNIQUE INDEX unique_citizen_merchant ON citizen_merchant_wallets (citizen_user_id, merchant_user_id)');
+        $this->addSql('CREATE TABLE citizen_profiles (id BIGINT NOT NULL, user_id BIGINT NOT NULL, address_city_id BIGINT DEFAULT NULL, public_id UUID NOT NULL, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, phone_number VARCHAR(20) DEFAULT NULL, date_of_birth DATE DEFAULT NULL, address_street VARCHAR(255) DEFAULT NULL, address_postal_code VARCHAR(10) DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_D1F27F96B5B48B91 ON citizen_profiles (public_id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_D1F27F96A76ED395 ON citizen_profiles (user_id)');
+        $this->addSql('CREATE INDEX IDX_D1F27F96D0499537 ON citizen_profiles (address_city_id)');
+        $this->addSql('CREATE INDEX idx_citizen_profiles_user_id ON citizen_profiles (user_id)');
+        $this->addSql('CREATE INDEX idx_citizen_profiles_public_id ON citizen_profiles (public_id)');
+        $this->addSql('CREATE TABLE coupons (id BIGINT NOT NULL, citizen_user_id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, reward_rule_id BIGINT NOT NULL, issued_from_deposit_id BIGINT DEFAULT NULL, redeemed_by_merchant_user_id BIGINT DEFAULT NULL, public_id UUID NOT NULL, status VARCHAR(20) DEFAULT \'ISSUED\' NOT NULL, product_sku VARCHAR(100) DEFAULT NULL, value_amount NUMERIC(6, 2) DEFAULT NULL, issued_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expires_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, redeemed_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_F5641118B5B48B91 ON coupons (public_id)');
+        $this->addSql('CREATE INDEX IDX_F56411189EF9FEA9 ON coupons (reward_rule_id)');
+        $this->addSql('CREATE INDEX IDX_F56411181062D705 ON coupons (issued_from_deposit_id)');
+        $this->addSql('CREATE INDEX IDX_F5641118AB39FA91 ON coupons (redeemed_by_merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_coupons_citizen_user_id ON coupons (citizen_user_id)');
+        $this->addSql('CREATE INDEX idx_coupons_merchant_user_id ON coupons (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_coupons_public_id ON coupons (public_id)');
+        $this->addSql('CREATE INDEX idx_coupons_status ON coupons (status)');
+        $this->addSql('CREATE INDEX idx_coupons_expires_at ON coupons (expires_at)');
+        $this->addSql('CREATE TABLE deposits (id BIGINT NOT NULL, citizen_user_id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, uuid UUID NOT NULL, weight_kg NUMERIC(8, 2) NOT NULL, status VARCHAR(20) DEFAULT \'PENDING\' NOT NULL, refused_reason TEXT DEFAULT NULL, notes TEXT DEFAULT NULL, accepted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, refused_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_449E9C9ED17F50A6 ON deposits (uuid)');
+        $this->addSql('CREATE INDEX idx_deposits_citizen_user_id ON deposits (citizen_user_id)');
+        $this->addSql('CREATE INDEX idx_deposits_merchant_user_id ON deposits (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_deposits_status ON deposits (status)');
+        $this->addSql('CREATE INDEX idx_deposits_created_at ON deposits (created_at)');
+        $this->addSql('CREATE INDEX idx_deposits_uuid ON deposits (uuid)');
+        $this->addSql('CREATE TABLE merchant_categories (id BIGINT NOT NULL, name VARCHAR(100) NOT NULL, slug VARCHAR(100) NOT NULL, icon VARCHAR(50) DEFAULT NULL, description TEXT DEFAULT NULL, is_active BOOLEAN DEFAULT true NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_589C81B85E237E06 ON merchant_categories (name)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_589C81B8989D9B62 ON merchant_categories (slug)');
+        $this->addSql('CREATE INDEX idx_merchant_categories_slug ON merchant_categories (slug)');
+        $this->addSql('CREATE TABLE merchant_profiles (id BIGINT NOT NULL, user_id BIGINT NOT NULL, category_id BIGINT DEFAULT NULL, address_city_id BIGINT NOT NULL, validated_by_user_id BIGINT DEFAULT NULL, public_id UUID NOT NULL, shop_name VARCHAR(255) NOT NULL, siret VARCHAR(14) DEFAULT NULL, address_street VARCHAR(255) NOT NULL, address_postal_code VARCHAR(10) NOT NULL, latitude NUMERIC(10, 8) NOT NULL, longitude NUMERIC(11, 8) NOT NULL, phone_number VARCHAR(20) DEFAULT NULL, opening_hours JSON DEFAULT NULL, max_storage_capacity_kg NUMERIC(8, 2) DEFAULT NULL, validation_status VARCHAR(20) DEFAULT \'PENDING\' NOT NULL, validated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, rejection_reason TEXT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_EC34F189B5B48B91 ON merchant_profiles (public_id)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_EC34F189A76ED395 ON merchant_profiles (user_id)');
+        $this->addSql('CREATE INDEX IDX_EC34F18912469DE2 ON merchant_profiles (category_id)');
+        $this->addSql('CREATE INDEX IDX_EC34F189D0499537 ON merchant_profiles (address_city_id)');
+        $this->addSql('CREATE INDEX IDX_EC34F18918951D42 ON merchant_profiles (validated_by_user_id)');
+        $this->addSql('CREATE INDEX idx_merchant_profiles_user_id ON merchant_profiles (user_id)');
+        $this->addSql('CREATE INDEX idx_merchant_profiles_public_id ON merchant_profiles (public_id)');
+        $this->addSql('CREATE INDEX idx_merchant_profiles_validation_status ON merchant_profiles (validation_status)');
+        $this->addSql('CREATE TABLE notifications (id BIGINT NOT NULL, user_id BIGINT NOT NULL, type VARCHAR(50) NOT NULL, title VARCHAR(255) NOT NULL, message TEXT NOT NULL, data JSON DEFAULT NULL, read_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, sent_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX idx_notifications_user_id ON notifications (user_id)');
+        $this->addSql('CREATE INDEX idx_notifications_read_at ON notifications (read_at)');
+        $this->addSql('CREATE INDEX idx_notifications_created_at ON notifications (created_at)');
+        $this->addSql('CREATE TABLE pro_profiles (id BIGINT NOT NULL, user_id BIGINT NOT NULL, validated_by_user_id BIGINT DEFAULT NULL, company_name VARCHAR(255) NOT NULL, siret VARCHAR(14) DEFAULT NULL, phone_number VARCHAR(20) DEFAULT NULL, vehicle_type VARCHAR(50) DEFAULT NULL, max_capacity_kg NUMERIC(8, 2) DEFAULT NULL, validation_status VARCHAR(20) DEFAULT \'PENDING\' NOT NULL, validated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_9AC427AAA76ED395 ON pro_profiles (user_id)');
+        $this->addSql('CREATE INDEX IDX_9AC427AA18951D42 ON pro_profiles (validated_by_user_id)');
+        $this->addSql('CREATE INDEX idx_pro_profiles_user_id ON pro_profiles (user_id)');
+        $this->addSql('CREATE INDEX idx_pro_profiles_validation_status ON pro_profiles (validation_status)');
+        $this->addSql('CREATE TABLE recoveries (id BIGINT NOT NULL, pro_user_id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, uuid UUID NOT NULL, qty_kg NUMERIC(8, 2) NOT NULL, status VARCHAR(20) DEFAULT \'PENDING\' NOT NULL, scheduled_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, completed_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, notes TEXT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_FF475351D17F50A6 ON recoveries (uuid)');
+        $this->addSql('CREATE INDEX idx_recoveries_pro_user_id ON recoveries (pro_user_id)');
+        $this->addSql('CREATE INDEX idx_recoveries_merchant_user_id ON recoveries (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_recoveries_status ON recoveries (status)');
+        $this->addSql('CREATE INDEX idx_recoveries_created_at ON recoveries (created_at)');
+        $this->addSql('CREATE TABLE refresh_tokens (id BIGINT NOT NULL, user_id BIGINT NOT NULL, token_hash VARCHAR(255) NOT NULL, expires_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, ip_address VARCHAR(45) DEFAULT NULL, user_agent TEXT DEFAULT NULL, revoked_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_9BACE7E1B3BC57DA ON refresh_tokens (token_hash)');
+        $this->addSql('CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens (user_id)');
+        $this->addSql('CREATE INDEX idx_refresh_tokens_token_hash ON refresh_tokens (token_hash)');
+        $this->addSql('CREATE INDEX idx_refresh_tokens_expires_at ON refresh_tokens (expires_at)');
+        $this->addSql('CREATE TABLE reward_rules (id BIGINT NOT NULL, merchant_user_id BIGINT DEFAULT NULL, category_id BIGINT DEFAULT NULL, uuid UUID NOT NULL, name VARCHAR(255) NOT NULL, scope VARCHAR(50) NOT NULL, threshold_kg NUMERIC(6, 2) NOT NULL, reward_type VARCHAR(50) NOT NULL, product_sku VARCHAR(100) DEFAULT NULL, value_amount NUMERIC(6, 2) DEFAULT NULL, expires_in_days INT NOT NULL, max_redemptions_per_user INT DEFAULT NULL, total_available INT DEFAULT NULL, valid_from TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, valid_until TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, is_active BOOLEAN DEFAULT true NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_EE46C260D17F50A6 ON reward_rules (uuid)');
+        $this->addSql('CREATE INDEX IDX_EE46C26012469DE2 ON reward_rules (category_id)');
+        $this->addSql('CREATE INDEX idx_reward_rules_scope ON reward_rules (scope)');
+        $this->addSql('CREATE INDEX idx_reward_rules_merchant_user_id ON reward_rules (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_reward_rules_is_active ON reward_rules (is_active)');
+        $this->addSql('CREATE TABLE stock_history (id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, performed_by_user_id BIGINT DEFAULT NULL, source_deposit_id BIGINT DEFAULT NULL, source_recovery_id BIGINT DEFAULT NULL, operation_type VARCHAR(20) NOT NULL, amount_kg NUMERIC(8, 2) NOT NULL, previous_stock_kg NUMERIC(10, 2) NOT NULL, new_stock_kg NUMERIC(10, 2) NOT NULL, source_type VARCHAR(50) DEFAULT NULL, source_id BIGINT DEFAULT NULL, notes TEXT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_3E1C60E843F2ED96 ON stock_history (performed_by_user_id)');
+        $this->addSql('CREATE INDEX IDX_3E1C60E8E4A19595 ON stock_history (source_deposit_id)');
+        $this->addSql('CREATE INDEX IDX_3E1C60E871F9F15F ON stock_history (source_recovery_id)');
+        $this->addSql('CREATE INDEX idx_stock_history_merchant_user_id ON stock_history (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_stock_history_created_at ON stock_history (created_at)');
+        $this->addSql('CREATE TABLE stocks (id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, available_kg NUMERIC(10, 2) DEFAULT \'0\' NOT NULL, alert_threshold_kg NUMERIC(8, 2) DEFAULT NULL, last_recovery_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_56F798057E50A60E ON stocks (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_stocks_merchant_user_id ON stocks (merchant_user_id)');
+        $this->addSql('CREATE TABLE users (id BIGINT NOT NULL, uuid UUID NOT NULL, email VARCHAR(180) NOT NULL, password_hash VARCHAR(255) DEFAULT NULL, google_sub VARCHAR(255) DEFAULT NULL, role VARCHAR(50) NOT NULL, is_active BOOLEAN DEFAULT true NOT NULL, email_verified_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, deleted_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_1483A5E9D17F50A6 ON users (uuid)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_1483A5E9E7927C74 ON users (email)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_1483A5E9E788A50 ON users (google_sub)');
+        $this->addSql('CREATE INDEX idx_users_email ON users (email)');
+        $this->addSql('CREATE INDEX idx_users_uuid ON users (uuid)');
+        $this->addSql('CREATE INDEX idx_users_google_sub ON users (google_sub)');
+        $this->addSql('CREATE INDEX idx_users_deleted_at ON users (deleted_at)');
+        $this->addSql('CREATE TABLE valorization_transactions (id BIGINT NOT NULL, recovery_id BIGINT NOT NULL, qty_kg NUMERIC(8, 2) NOT NULL, price_per_kg NUMERIC(6, 2) NOT NULL, merchant_amount NUMERIC(10, 2) NOT NULL, reup_amount NUMERIC(10, 2) NOT NULL, payment_status VARCHAR(20) DEFAULT \'PENDING\' NOT NULL, paid_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_1AAC05244D86A1FF ON valorization_transactions (recovery_id)');
+        $this->addSql('CREATE INDEX idx_valorization_transactions_recovery_id ON valorization_transactions (recovery_id)');
+        $this->addSql('CREATE INDEX idx_valorization_transactions_payment_status ON valorization_transactions (payment_status)');
+        $this->addSql('CREATE INDEX idx_valorization_transactions_created_at ON valorization_transactions (created_at)');
+        $this->addSql('CREATE TABLE wallet_transactions (id BIGINT NOT NULL, citizen_user_id BIGINT NOT NULL, merchant_user_id BIGINT NOT NULL, wallet_id BIGINT NOT NULL, coupon_id BIGINT DEFAULT NULL, source_deposit_id BIGINT DEFAULT NULL, type VARCHAR(20) NOT NULL, source_type VARCHAR(50) DEFAULT NULL, source_id BIGINT DEFAULT NULL, amount_kg NUMERIC(8, 2) NOT NULL, notes TEXT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_A50205E2712520F3 ON wallet_transactions (wallet_id)');
+        $this->addSql('CREATE INDEX IDX_A50205E266C5951B ON wallet_transactions (coupon_id)');
+        $this->addSql('CREATE INDEX IDX_A50205E2E4A19595 ON wallet_transactions (source_deposit_id)');
+        $this->addSql('CREATE INDEX idx_wallet_transactions_citizen_user_id ON wallet_transactions (citizen_user_id)');
+        $this->addSql('CREATE INDEX idx_wallet_transactions_merchant_user_id ON wallet_transactions (merchant_user_id)');
+        $this->addSql('CREATE INDEX idx_wallet_transactions_created_at ON wallet_transactions (created_at)');
+        $this->addSql('ALTER TABLE audit_logs ADD CONSTRAINT FK_D62F2858A76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE citizen_merchant_wallets ADD CONSTRAINT FK_CDEB3CBE604B6E6B FOREIGN KEY (citizen_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE citizen_merchant_wallets ADD CONSTRAINT FK_CDEB3CBE7E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE citizen_profiles ADD CONSTRAINT FK_D1F27F96A76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE citizen_profiles ADD CONSTRAINT FK_D1F27F96D0499537 FOREIGN KEY (address_city_id) REFERENCES cities (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE coupons ADD CONSTRAINT FK_F5641118604B6E6B FOREIGN KEY (citizen_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE coupons ADD CONSTRAINT FK_F56411187E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE coupons ADD CONSTRAINT FK_F56411189EF9FEA9 FOREIGN KEY (reward_rule_id) REFERENCES reward_rules (id) ON DELETE RESTRICT NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE coupons ADD CONSTRAINT FK_F56411181062D705 FOREIGN KEY (issued_from_deposit_id) REFERENCES deposits (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE coupons ADD CONSTRAINT FK_F5641118AB39FA91 FOREIGN KEY (redeemed_by_merchant_user_id) REFERENCES users (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE deposits ADD CONSTRAINT FK_449E9C9E604B6E6B FOREIGN KEY (citizen_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE deposits ADD CONSTRAINT FK_449E9C9E7E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE merchant_profiles ADD CONSTRAINT FK_EC34F189A76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE merchant_profiles ADD CONSTRAINT FK_EC34F18912469DE2 FOREIGN KEY (category_id) REFERENCES merchant_categories (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE merchant_profiles ADD CONSTRAINT FK_EC34F189D0499537 FOREIGN KEY (address_city_id) REFERENCES cities (id) ON DELETE RESTRICT NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE merchant_profiles ADD CONSTRAINT FK_EC34F18918951D42 FOREIGN KEY (validated_by_user_id) REFERENCES users (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE notifications ADD CONSTRAINT FK_6000B0D3A76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE pro_profiles ADD CONSTRAINT FK_9AC427AAA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE pro_profiles ADD CONSTRAINT FK_9AC427AA18951D42 FOREIGN KEY (validated_by_user_id) REFERENCES users (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE recoveries ADD CONSTRAINT FK_FF47535152C7154E FOREIGN KEY (pro_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE recoveries ADD CONSTRAINT FK_FF4753517E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE refresh_tokens ADD CONSTRAINT FK_9BACE7E1A76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE reward_rules ADD CONSTRAINT FK_EE46C2607E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE reward_rules ADD CONSTRAINT FK_EE46C26012469DE2 FOREIGN KEY (category_id) REFERENCES merchant_categories (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE stock_history ADD CONSTRAINT FK_3E1C60E87E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE stock_history ADD CONSTRAINT FK_3E1C60E843F2ED96 FOREIGN KEY (performed_by_user_id) REFERENCES users (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE stock_history ADD CONSTRAINT FK_3E1C60E8E4A19595 FOREIGN KEY (source_deposit_id) REFERENCES deposits (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE stock_history ADD CONSTRAINT FK_3E1C60E871F9F15F FOREIGN KEY (source_recovery_id) REFERENCES recoveries (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE stocks ADD CONSTRAINT FK_56F798057E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE valorization_transactions ADD CONSTRAINT FK_1AAC05244D86A1FF FOREIGN KEY (recovery_id) REFERENCES recoveries (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE wallet_transactions ADD CONSTRAINT FK_A50205E2604B6E6B FOREIGN KEY (citizen_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE wallet_transactions ADD CONSTRAINT FK_A50205E27E50A60E FOREIGN KEY (merchant_user_id) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE wallet_transactions ADD CONSTRAINT FK_A50205E2712520F3 FOREIGN KEY (wallet_id) REFERENCES citizen_merchant_wallets (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE wallet_transactions ADD CONSTRAINT FK_A50205E266C5951B FOREIGN KEY (coupon_id) REFERENCES coupons (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE wallet_transactions ADD CONSTRAINT FK_A50205E2E4A19595 FOREIGN KEY (source_deposit_id) REFERENCES deposits (id) ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE');
+    }
+
+    public function down(Schema $schema): void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SCHEMA public');
+        $this->addSql('DROP SEQUENCE audit_logs_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE cities_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE citizen_merchant_wallets_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE citizen_profiles_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE coupons_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE deposits_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE merchant_categories_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE merchant_profiles_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE notifications_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE pro_profiles_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE recoveries_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE refresh_tokens_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE reward_rules_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE stock_history_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE stocks_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE users_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE valorization_transactions_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE wallet_transactions_id_seq CASCADE');
+        $this->addSql('ALTER TABLE audit_logs DROP CONSTRAINT FK_D62F2858A76ED395');
+        $this->addSql('ALTER TABLE citizen_merchant_wallets DROP CONSTRAINT FK_CDEB3CBE604B6E6B');
+        $this->addSql('ALTER TABLE citizen_merchant_wallets DROP CONSTRAINT FK_CDEB3CBE7E50A60E');
+        $this->addSql('ALTER TABLE citizen_profiles DROP CONSTRAINT FK_D1F27F96A76ED395');
+        $this->addSql('ALTER TABLE citizen_profiles DROP CONSTRAINT FK_D1F27F96D0499537');
+        $this->addSql('ALTER TABLE coupons DROP CONSTRAINT FK_F5641118604B6E6B');
+        $this->addSql('ALTER TABLE coupons DROP CONSTRAINT FK_F56411187E50A60E');
+        $this->addSql('ALTER TABLE coupons DROP CONSTRAINT FK_F56411189EF9FEA9');
+        $this->addSql('ALTER TABLE coupons DROP CONSTRAINT FK_F56411181062D705');
+        $this->addSql('ALTER TABLE coupons DROP CONSTRAINT FK_F5641118AB39FA91');
+        $this->addSql('ALTER TABLE deposits DROP CONSTRAINT FK_449E9C9E604B6E6B');
+        $this->addSql('ALTER TABLE deposits DROP CONSTRAINT FK_449E9C9E7E50A60E');
+        $this->addSql('ALTER TABLE merchant_profiles DROP CONSTRAINT FK_EC34F189A76ED395');
+        $this->addSql('ALTER TABLE merchant_profiles DROP CONSTRAINT FK_EC34F18912469DE2');
+        $this->addSql('ALTER TABLE merchant_profiles DROP CONSTRAINT FK_EC34F189D0499537');
+        $this->addSql('ALTER TABLE merchant_profiles DROP CONSTRAINT FK_EC34F18918951D42');
+        $this->addSql('ALTER TABLE notifications DROP CONSTRAINT FK_6000B0D3A76ED395');
+        $this->addSql('ALTER TABLE pro_profiles DROP CONSTRAINT FK_9AC427AAA76ED395');
+        $this->addSql('ALTER TABLE pro_profiles DROP CONSTRAINT FK_9AC427AA18951D42');
+        $this->addSql('ALTER TABLE recoveries DROP CONSTRAINT FK_FF47535152C7154E');
+        $this->addSql('ALTER TABLE recoveries DROP CONSTRAINT FK_FF4753517E50A60E');
+        $this->addSql('ALTER TABLE refresh_tokens DROP CONSTRAINT FK_9BACE7E1A76ED395');
+        $this->addSql('ALTER TABLE reward_rules DROP CONSTRAINT FK_EE46C2607E50A60E');
+        $this->addSql('ALTER TABLE reward_rules DROP CONSTRAINT FK_EE46C26012469DE2');
+        $this->addSql('ALTER TABLE stock_history DROP CONSTRAINT FK_3E1C60E87E50A60E');
+        $this->addSql('ALTER TABLE stock_history DROP CONSTRAINT FK_3E1C60E843F2ED96');
+        $this->addSql('ALTER TABLE stock_history DROP CONSTRAINT FK_3E1C60E8E4A19595');
+        $this->addSql('ALTER TABLE stock_history DROP CONSTRAINT FK_3E1C60E871F9F15F');
+        $this->addSql('ALTER TABLE stocks DROP CONSTRAINT FK_56F798057E50A60E');
+        $this->addSql('ALTER TABLE valorization_transactions DROP CONSTRAINT FK_1AAC05244D86A1FF');
+        $this->addSql('ALTER TABLE wallet_transactions DROP CONSTRAINT FK_A50205E2604B6E6B');
+        $this->addSql('ALTER TABLE wallet_transactions DROP CONSTRAINT FK_A50205E27E50A60E');
+        $this->addSql('ALTER TABLE wallet_transactions DROP CONSTRAINT FK_A50205E2712520F3');
+        $this->addSql('ALTER TABLE wallet_transactions DROP CONSTRAINT FK_A50205E266C5951B');
+        $this->addSql('ALTER TABLE wallet_transactions DROP CONSTRAINT FK_A50205E2E4A19595');
+        $this->addSql('DROP TABLE audit_logs');
+        $this->addSql('DROP TABLE cities');
+        $this->addSql('DROP TABLE citizen_merchant_wallets');
+        $this->addSql('DROP TABLE citizen_profiles');
+        $this->addSql('DROP TABLE coupons');
+        $this->addSql('DROP TABLE deposits');
+        $this->addSql('DROP TABLE merchant_categories');
+        $this->addSql('DROP TABLE merchant_profiles');
+        $this->addSql('DROP TABLE notifications');
+        $this->addSql('DROP TABLE pro_profiles');
+        $this->addSql('DROP TABLE recoveries');
+        $this->addSql('DROP TABLE refresh_tokens');
+        $this->addSql('DROP TABLE reward_rules');
+        $this->addSql('DROP TABLE stock_history');
+        $this->addSql('DROP TABLE stocks');
+        $this->addSql('DROP TABLE users');
+        $this->addSql('DROP TABLE valorization_transactions');
+        $this->addSql('DROP TABLE wallet_transactions');
+    }
+}
