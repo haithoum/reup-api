@@ -383,5 +383,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->passwordHash;
     }
+
+    public function setPassword(string $password): self
+    {
+        $this->passwordHash = $password;
+        return $this;
+    }
+
+    // Helper methods
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleSub;
+    }
+
+    public function setGoogleId(?string $googleId): self
+    {
+        $this->googleSub = $googleId;
+        return $this;
+    }
+
+
 }
 

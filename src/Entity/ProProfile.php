@@ -24,6 +24,14 @@ class ProProfile
     #[ORM\JoinColumn(nullable: false, unique: true, onDelete: 'CASCADE')]
     private ?User $user = null;
 
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank]
+    private ?string $lastName = null;
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $companyName = null;
@@ -81,6 +89,28 @@ class ProProfile
     public function setUser(?User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): self
+    {
+        $this->firstName = $firstName;
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
         return $this;
     }
 
