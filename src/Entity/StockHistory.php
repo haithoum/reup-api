@@ -196,5 +196,39 @@ class StockHistory
         $this->createdAt = $createdAt;
         return $this;
     }
+
+    // ==================== ALIAS METHODS FOR API ====================
+
+    /**
+     * Alias pour getOperationType() pour correspondre à l'API
+     */
+    public function getType(): ?string
+    {
+        return $this->getOperationType();
+    }
+
+    /**
+     * Alias pour getAmountKg() pour correspondre à l'API
+     */
+    public function getWeightKg(): ?string
+    {
+        return $this->getAmountKg();
+    }
+
+    /**
+     * Alias pour getSourceDeposit() pour correspondre à l'API
+     */
+    public function getRelatedDeposit(): ?Deposit
+    {
+        return $this->getSourceDeposit();
+    }
+
+    /**
+     * Alias pour getSourceRecovery() pour correspondre à l'API
+     */
+    public function getRelatedRecovery(): ?Recovery
+    {
+        return $this->getSourceRecovery();
+    }
 }
 

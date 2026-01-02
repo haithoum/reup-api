@@ -131,5 +131,28 @@ class Stock
         }
         return bccomp($this->availableKg, $this->alertThresholdKg, 2) >= 0;
     }
+
+    // Alias methods for API compatibility
+    public function getCurrentWeightKg(): string
+    {
+        return $this->availableKg;
+    }
+
+    public function setCurrentWeightKg(string $weightKg): self
+    {
+        $this->availableKg = $weightKg;
+        return $this;
+    }
+
+    public function getMerchantProfile(): ?User
+    {
+        return $this->merchantUser;
+    }
+
+    public function setMerchantProfile(?User $merchantUser): self
+    {
+        $this->merchantUser = $merchantUser;
+        return $this;
+    }
 }
 

@@ -414,5 +414,39 @@ class MerchantProfile
     {
         return $this->validationStatus === 'REJECTED';
     }
+
+    // Alias methods for API compatibility
+    public function getStoreName(): ?string
+    {
+        return $this->shopName;
+    }
+
+    public function setStoreName(string $storeName): self
+    {
+        $this->shopName = $storeName;
+        return $this;
+    }
+
+    public function getMerchantCategory(): ?MerchantCategory
+    {
+        return $this->category;
+    }
+
+    public function setMerchantCategory(?MerchantCategory $category): self
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->validationStatus;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->validationStatus = $status;
+        return $this;
+    }
 }
 
