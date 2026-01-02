@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ReUp Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .stat-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card.primary { border-color: #3498db; }
+        .stat-card.success { border-color: #2ecc71; }
+        .stat-card.warning { border-color: #f39c12; }
+        .stat-card.danger { border-color: #e74c3c; }
+        .stat-card.info { border-color: #1abc9c; }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .impact-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .top-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .top-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.75rem 0;
+        }
+        .top-item:last-child {
+            border-bottom: none;
+        }
+        .badge-pending {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+{% endblock %}
+{% block content_body %}
+    hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+
+<div class="container-fluid">
+
+    <!-- DEBUG: Affichage des données pour vérification -->
+    {% if app.debug %}
+    <div class="alert alert-info">
+        <strong>🔍 Debug Info:</strong><br>
+        GlobalStats présent: {{ globalStats is defined ? 'OUI' : 'NON' }}<br>
+        {% if globalStats is defined and globalStats is not empty %}
+            <strong>Users:</strong> Total={{ globalStats.users.total ?? 'NULL' }}, Active={{ globalStats.users.active ?? 'NULL' }}<br>
+            <strong>Deposits:</strong> Total={{ globalStats.deposits.total_deposits ?? 'NULL' }}, Weight={{ globalStats.deposits.total_weight_kg ?? 'NULL' }}<br>
+            <strong>Stock:</strong> Total={{ globalStats.stock.total_stock_kg ?? 'NULL' }}, Merchants={{ globalStats.stock.merchants_with_stock ?? 'NULL' }}<br>
+            <strong>Coupons:</strong> Total={{ globalStats.coupons.total_coupons ?? 'NULL' }}, Available={{ globalStats.coupons.available_coupons ?? 'NULL' }}<br>
+            <strong>Pending:</strong> Merchants={{ globalStats.pending_validations.merchants ?? 'NULL' }}, Pros={{ globalStats.pending_validations.pros ?? 'NULL' }}<br>
+            <hr>
+            <details>
+                <summary>Voir toutes les données (JSON)</summary>
+                <pre>{{ globalStats|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}</pre>
+            </details>
+        {% else %}
+            <span class="text-danger">⚠️ GlobalStats est vide ou non défini!</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- En-tête avec alertes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h2 mb-3">👋 Bienvenue sur ReUp Admin test</h1>
+
+            {% if globalStats is defined and globalStats.pending_validations is defined and globalStats.pending_validations.total > 0 %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fa fa-exclamation-triangle"></i>
+                <strong>Actions requises :</strong>
+                {{ globalStats.pending_validations.merchants }} commerçant(s) et
+                {{ globalStats.pending_validations.pros }} acteur(s) pro en attente de validation.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- KPIs principaux -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stat-card primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label mb-2">Total Utilisateurs</p>
+                            <p class="stat-number text-primary">{{ globalStats.users.total|default(0) }}</p>
+                            <small class="text-muted">{{ globalStats.users.active|default(0) }} actifs</small>
+                        </div>
+                        <div class="text-primary" style="font-size: 3rem; opacity: 0.2;">
+                            <i class="fa fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stat-card success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label mb-2">Pain Collecté</p>
+                            <p class="stat-number text-success">{{ globalStats.deposits.total_weight_kg|default(0)|number_format(2) }}</p>
+                            <small class="text-muted">kg au total</small>
+                        </div>
+                        <div class="text-success" style="font-size: 3rem; opacity: 0.2;">
+                            <i class="fa fa-bread-slice"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stat-card warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label mb-2">Stock Actuel</p>
+                            <p class="stat-number text-warning">{{ globalStats.stock.total_stock_kg|default(0)|number_format(2) }}</p>
+                            <small class="text-muted">kg chez {{ globalStats.stock.merchants_with_stock|default(0) }} commerçants</small>
+                        </div>
+                        <div class="text-warning" style="font-size: 3rem; opacity: 0.2;">
+                            <i class="fa fa-boxes"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stat-card info h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label mb-2">Coupons Actifs</p>
+                            <p class="stat-number text-info">{{ globalStats.coupons.available_coupons|default(0) }}</p>
+                            <small class="text-muted">{{ globalStats.coupons.redeemed_coupons|default(0) }} utilisés</small>
+                        </div>
+                        <div class="text-info" style="font-size: 3rem; opacity: 0.2;">
+                            <i class="fa fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact environnemental -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="impact-section">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <i class="fa fa-leaf fa-3x mb-2"></i>
+                        <h3 class="mb-1">{{ environmentalImpact.co2_saved_kg|default(0)|number_format(0) }} kg</h3>
+                        <p class="mb-0">CO₂ économisé</p>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <i class="fa fa-utensils fa-3x mb-2"></i>
+                        <h3 class="mb-1">{{ environmentalImpact.meals_equivalent|default(0)|number_format(0) }}</h3>
+                        <p class="mb-0">Repas équivalents</p>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <i class="fa fa-user-check fa-3x mb-2"></i>
+                        <h3 class="mb-1">{{ environmentalImpact.active_citizens|default(0) }}</h3>
+                        <p class="mb-0">Citoyens actifs</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fa fa-store fa-3x mb-2"></i>
+                        <h3 class="mb-1">{{ environmentalImpact.active_merchants|default(0) }}</h3>
+                        <p class="mb-0">Commerçants actifs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fa fa-chart-line"></i> Activité des 30 derniers jours
+                </div>
+                <div class="card-body">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fa fa-chart-pie"></i> Répartition des utilisateurs
+                </div>
+                <div class="card-body">
+                    <canvas id="usersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fa fa-chart-bar"></i> Commerçants par catégorie
+                </div>
+                <div class="card-body">
+                    <canvas id="merchantsCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fa fa-chart-line"></i> Évolution des coupons (30 jours)
+                </div>
+                <div class="card-body">
+                    <canvas id="couponsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top listes -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <i class="fa fa-trophy"></i> Top 10 Commerçants
+                </div>
+                <div class="card-body top-list">
+                    {% if topMerchants is empty %}
+                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                    {% else %}
+                        {% for merchant in topMerchants %}
+                        <div class="top-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ loop.index }}. {{ merchant.shop_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ merchant.total_deposits }} dépôts</small>
+                                </div>
+                                <div class="text-right">
+                                    <span class="badge badge-success badge-pill">
+                                        {{ merchant.total_collected_kg|number_format(2) }} kg
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="fa fa-star"></i> Top 10 Citoyens
+                </div>
+                <div class="card-body top-list">
+                    {% if topCitizens is empty %}
+                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                    {% else %}
+                        {% for citizen in topCitizens %}
+                        <div class="top-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ loop.index }}. {{ citizen.first_name }} {{ citizen.last_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ citizen.total_deposits }} dépôts</small>
+                                </div>
+                                <div class="text-right">
+                                    <span class="badge badge-primary badge-pill">
+                                        {{ citizen.total_deposited_kg|number_format(2) }} kg
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques détaillées -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <i class="fa fa-arrow-down"></i> Statistiques Dépôts
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <strong>Total dépôts :</strong> {{ globalStats.deposits.total_deposits }}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Acceptés :</strong>
+                            <span class="text-success">{{ globalStats.deposits.accepted_deposits }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Poids moyen :</strong> {{ globalStats.deposits.avg_weight_kg|number_format(2) }} kg
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <i class="fa fa-arrow-up"></i> Statistiques Récupérations
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <strong>Total récupérations :</strong> {{ globalStats.recoveries.total_recoveries }}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Poids total :</strong>
+                            <span class="text-info">{{ globalStats.recoveries.total_weight_recovered_kg|number_format(2) }} kg</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <i class="fa fa-users"></i> Répartition par Rôle
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for role, stats in globalStats.users.by_role %}
+                        <li class="mb-2">
+                            <strong>{{ role|replace({'ROLE_': ''}) }} :</strong>
+                            {{ stats.total }} ({{ stats.active }} actifs)
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js et initialisation des graphiques -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Initialisation immédiate sans attente
+    console.log('🚀 Initialisation des graphiques...');
+    console.log('Chart.js disponible:', typeof Chart !== 'undefined');
+
+    // Vérifier les éléments
+    const activityChartElement = document.getElementById('activityChart');
+    const usersChartElement = document.getElementById('usersChart');
+    const merchantsCategoryChartElement = document.getElementById('merchantsCategoryChart');
+    const couponsChartElement = document.getElementById('couponsChart');
+
+    console.log('📊 Éléments trouvés:', {
+        activityChart: !!activityChartElement,
+        usersChart: !!usersChartElement,
+        merchantsCategoryChart: !!merchantsCategoryChartElement,
+        couponsChart: !!couponsChartElement
+    });
+
+    // Configuration Chart.js
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial';
+    }
+
+    // Graphique d'activité (dépôts et récupérations)
+    console.log('📊 activityChart element:', activityChartElement);
+    if (activityChartElement) {
+        const activityCtx = activityChartElement.getContext('2d');
+        const depositsData = {{ last30DaysStats.deposits|default([])|json_encode|raw }};
+        const recoveriesData = {{ last30DaysStats.recoveries|default([])|json_encode|raw }};
+
+        console.log('📈 Données dépôts:', depositsData);
+        console.log('📈 Données récupérations:', recoveriesData);
+
+        const activityLabels = depositsData.map(d => d.date);
+        const activityChart = new Chart(activityCtx, {
+            type: 'line',
+            data: {
+                labels: activityLabels,
+                datasets: [
+                    {
+                        label: 'Dépôts (kg)',
+                        data: depositsData.map(d => d.total_weight_kg),
+                        borderColor: 'rgb(46, 204, 113)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Récupérations (kg)',
+                        data: recoveriesData.map(d => d.total_weight_kg),
+                        borderColor: 'rgb(52, 152, 219)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        console.log('✅ Graphique activité créé');
+    } else {
+        console.log('❌ Element activityChart non trouvé');
+    }
+
+    // Graphique utilisateurs par rôle
+    console.log('📊 usersChart element:', usersChartElement);
+    if (usersChartElement) {
+        const usersCtx = usersChartElement.getContext('2d');
+        const usersData = {{ globalStats.users.by_role|default({})|json_encode|raw }};
+        const usersChart = new Chart(usersCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(usersData).map(role => role.replace('ROLE_', '')),
+                datasets: [{
+                    data: Object.values(usersData).map(stat => stat.total),
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.8)',
+                        'rgba(46, 204, 113, 0.8)',
+                        'rgba(243, 156, 18, 0.8)',
+                        'rgba(231, 76, 60, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        console.log('✅ Graphique utilisateurs créé');
+    } else {
+        console.log('❌ Element usersChart non trouvé');
+    }
+
+    // Graphique commerçants par catégorie
+    console.log('📊 merchantsCategoryChart element:', merchantsCategoryChartElement);
+    if (merchantsCategoryChartElement) {
+        const merchantsCategoryCtx = merchantsCategoryChartElement.getContext('2d');
+        const merchantsCategoryData = {{ merchantsByCategory|default([])|json_encode|raw }};
+        console.log('📈 Données commerçants:', merchantsCategoryData);
+        const merchantsCategoryChart = new Chart(merchantsCategoryCtx, {
+            type: 'bar',
+            data: {
+                labels: merchantsCategoryData.map(m => m.category_name),
+                datasets: [{
+                    label: 'Nombre de commerçants',
+                    data: merchantsCategoryData.map(m => m.merchant_count),
+                    backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        console.log('✅ Graphique commerçants créé');
+    } else {
+        console.log('❌ Element merchantsCategoryChart non trouvé');
+    }
+
+    // Graphique coupons utilisés
+    if (couponsChartElement) {
+        const couponsCtx = couponsChartElement.getContext('2d');
+        const couponsData = {{ last30DaysStats.coupons_redeemed|default([])|json_encode|raw }};
+        const couponsChart = new Chart(couponsCtx, {
+            type: 'line',
+            data: {
+                labels: couponsData.map(c => c.date),
+                datasets: [{
+                    label: 'Coupons utilisés',
+                    data: couponsData.map(c => c.count),
+                    borderColor: 'rgb(26, 188, 156)',
+                    backgroundColor: 'rgba(26, 188, 156, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        console.log('✅ Graphique coupons créé');
+    } else {
+        console.log('❌ Element couponsChart non trouvé');
+    }
+
+    console.log('🎉 Initialisation des graphiques terminée');
+</script>
+{% endblock %}
+

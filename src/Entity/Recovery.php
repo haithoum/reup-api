@@ -330,5 +330,20 @@ class Recovery
         $this->scheduledAt = $date;
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $proName = $this->proUser ? $this->proUser->getEmail() : 'N/A';
+        $merchantName = $this->merchantUser ? $this->merchantUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Récupération #%s - %s kg - %s (Pro: %s, Commerçant: %s)',
+            $this->id ?? 'nouvelle',
+            $this->qtyKg ?? '0',
+            $this->status,
+            $proName,
+            $merchantName
+        );
+    }
 }
 

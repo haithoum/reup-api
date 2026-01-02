@@ -39,6 +39,16 @@ class ProProfile
     #[ORM\Column(length: 14, nullable: true)]
     private ?string $siret = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $addressStreet = null;
+
+    #[ORM\ManyToOne(targetEntity: City::class, inversedBy: 'proProfiles')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?City $addressCity = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $addressPostalCode = null;
+
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phoneNumber = null;
 
@@ -133,6 +143,39 @@ class ProProfile
     public function setSiret(?string $siret): self
     {
         $this->siret = $siret;
+        return $this;
+    }
+
+    public function getAddressStreet(): ?string
+    {
+        return $this->addressStreet;
+    }
+
+    public function setAddressStreet(?string $addressStreet): self
+    {
+        $this->addressStreet = $addressStreet;
+        return $this;
+    }
+
+    public function getAddressCity(): ?City
+    {
+        return $this->addressCity;
+    }
+
+    public function setAddressCity(?City $addressCity): self
+    {
+        $this->addressCity = $addressCity;
+        return $this;
+    }
+
+    public function getAddressPostalCode(): ?string
+    {
+        return $this->addressPostalCode;
+    }
+
+    public function setAddressPostalCode(?string $addressPostalCode): self
+    {
+        $this->addressPostalCode = $addressPostalCode;
         return $this;
     }
 

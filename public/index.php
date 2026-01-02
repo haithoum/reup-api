@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 // if you don't want to setup permissions the proper way, just uncomment the following PHP line

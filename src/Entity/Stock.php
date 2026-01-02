@@ -154,5 +154,17 @@ class Stock
         $this->merchantUser = $merchantUser;
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $merchantName = $this->merchantUser ? $this->merchantUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Stock #%s - %s kg (Commerçant: %s)',
+            $this->id ?? 'nouveau',
+            $this->availableKg,
+            $merchantName
+        );
+    }
 }
 

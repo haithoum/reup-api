@@ -255,5 +255,20 @@ class Deposit
     {
         return $this->status === 'CANCELLED';
     }
+
+    public function __toString(): string
+    {
+        $citizenName = $this->citizenUser ? $this->citizenUser->getEmail() : 'N/A';
+        $merchantName = $this->merchantUser ? $this->merchantUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Dépôt #%s - %s kg - %s (Citoyen: %s, Commerçant: %s)',
+            $this->id ?? 'nouveau',
+            $this->weightKg ?? '0',
+            $this->status,
+            $citizenName,
+            $merchantName
+        );
+    }
 }
 

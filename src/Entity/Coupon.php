@@ -280,5 +280,18 @@ class Coupon
         $this->issuedAt = $createdAt;
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $citizenName = $this->citizenUser ? $this->citizenUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Coupon #%s - %s - %s (Citoyen: %s)',
+            $this->id ?? 'nouveau',
+            $this->status,
+            $this->expiresAt ? $this->expiresAt->format('d/m/Y') : 'N/A',
+            $citizenName
+        );
+    }
 }
 

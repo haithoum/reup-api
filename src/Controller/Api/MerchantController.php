@@ -31,7 +31,7 @@ class MerchantController extends AbstractController
         $radius = $request->query->get('radius', 10); // 10km par défaut
 
         $qb = $this->merchantProfileRepository->createQueryBuilder('m')
-            ->where('m.status = :status')
+            ->where('m.validationStatus = :status')
             ->setParameter('status', 'APPROVED');
 
         if ($cityId) {
@@ -40,30 +40,38 @@ class MerchantController extends AbstractController
         }
 
         if ($categoryId) {
-            $qb->andWhere('m.merchantCategory = :categoryId')
+            $qb->andWhere('m.category = :categoryId')
                 ->setParameter('categoryId', $categoryId);
         }
 
         if ($hasStock === 'true') {
-            $qb->leftJoin('m.stock', 's')
-                ->andWhere('s.currentWeightKg > 0');
+            $qb->join('m.user', 'u')
+                ->join('App\Entity\Stock', 's', 'WITH', 's.merchantUser = u')
+                ->andWhere('s.availableKg > 0');
         }
 
         $merchants = $qb->getQuery()->getResult();
 
         $result = [];
         foreach ($merchants as $merchant) {
+            // Récupérer le stock via l'utilisateur
+            $stock = null;
+            if ($merchant->getUser()) {
+                $stock = $this->entityManager->getRepository(\App\Entity\Stock::class)
+                    ->findOneBy(['merchantUser' => $merchant->getUser()]);
+            }
+
             $data = [
                 'id' => $merchant->getPublicId(),
-                'storeName' => $merchant->getStoreName(),
-                'category' => $merchant->getMerchantCategory()?->getName(),
+                'storeName' => $merchant->getShopName(),
+                'category' => $merchant->getCategory()?->getName(),
                 'address' => $merchant->getAddressStreet(),
                 'city' => $merchant->getAddressCity()?->getName(),
                 'coordinates' => [
                     'latitude' => $merchant->getLatitude(),
                     'longitude' => $merchant->getLongitude()
                 ],
-                'stockKg' => $merchant->getStock()?->getCurrentWeightKg() ?? 0
+                'stockKg' => $stock?->getAvailableKg() ?? 0
             ];
 
             // Calculer la distance si lat/long fournis

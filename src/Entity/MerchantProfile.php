@@ -101,8 +101,8 @@ class MerchantProfile
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\OneToOne(mappedBy: 'merchantUser', targetEntity: Stock::class, cascade: ['persist', 'remove'])]
-    private ?Stock $stock = null;
+    // Note: Stock relation removed - access stock via $this->user->getStock() instead
+    // The Stock entity references User, not MerchantProfile
 
     #[ORM\OneToMany(mappedBy: 'merchantUser', targetEntity: Deposit::class)]
     private Collection $deposits;
@@ -361,24 +361,8 @@ class MerchantProfile
         return $this;
     }
 
-    public function getStock(): ?Stock
-    {
-        return $this->stock;
-    }
-
-    public function setStock(?Stock $stock): self
-    {
-        if ($stock === null && $this->stock !== null) {
-            $this->stock->setMerchantUser(null);
-        }
-
-        if ($stock !== null && $stock->getMerchantUser() !== $this->user) {
-            $stock->setMerchantUser($this->user);
-        }
-
-        $this->stock = $stock;
-        return $this;
-    }
+    // Stock access removed - use $this->user to access the associated stock
+    // Stock entity references User, not MerchantProfile directly
 
     public function getDeposits(): Collection
     {
