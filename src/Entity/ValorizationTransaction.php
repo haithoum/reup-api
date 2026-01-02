@@ -161,5 +161,31 @@ class ValorizationTransaction
     {
         return $this->paymentStatus === 'PAID';
     }
+
+    // ==================== ALIAS METHODS FOR API ====================
+
+    /**
+     * Génère un UUID pour correspondre à l'API
+     */
+    public function getUuid(): string
+    {
+        return 'valorization-' . $this->getId();
+    }
+
+    /**
+     * Alias pour getQtyKg() pour correspondre à l'API
+     */
+    public function getWeightKg(): ?string
+    {
+        return $this->getQtyKg();
+    }
+
+    /**
+     * Alias pour getMerchantAmount() pour correspondre à l'API
+     */
+    public function getAmountEarned(): ?string
+    {
+        return $this->getMerchantAmount();
+    }
 }
 

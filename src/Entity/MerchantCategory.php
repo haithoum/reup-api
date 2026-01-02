@@ -133,5 +133,10 @@ class MerchantCategory
     {
         return $this->rewardRules;
     }
+
+    public function __toString(): string
+    {
+        return $this->name ?? 'Catégorie sans nom';
+    }
 }
 

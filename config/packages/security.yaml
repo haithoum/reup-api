@@ -18,6 +18,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        # Firewall pour l'administration
+        admin:
+            pattern: ^/admin
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
+                default_target_path: admin
+                enable_csrf: true
+            logout:
+                path: admin_logout
+                target: admin_login
+            entry_point: App\Security\AdminAuthenticationEntryPoint
+
         # Endpoints publics (login, register, refresh)
         auth:
             pattern: ^/api/auth
@@ -39,6 +54,14 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Login admin public
+        - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+
+        # Documentation API publique (OpenAPI/Swagger)
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
+
         # Public
         - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/login, roles: PUBLIC_ACCESS }

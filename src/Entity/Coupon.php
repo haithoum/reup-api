@@ -241,5 +241,57 @@ class Coupon
     {
         return $this->isIssued() && !$this->isExpired();
     }
+
+    // Alias methods for API compatibility
+    public function getUuid(): ?string
+    {
+        return $this->publicId;
+    }
+
+    public function getQrCodeValue(): ?string
+    {
+        return $this->publicId;
+    }
+
+    public function setQrCodeValue(string $qrCode): self
+    {
+        $this->publicId = $qrCode;
+        return $this;
+    }
+
+    public function getUsedAt(): ?\DateTimeInterface
+    {
+        return $this->redeemedAt;
+    }
+
+    public function setUsedAt(?\DateTimeInterface $usedAt): self
+    {
+        $this->redeemedAt = $usedAt;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->issuedAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->issuedAt = $createdAt;
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        $citizenName = $this->citizenUser ? $this->citizenUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Coupon #%s - %s - %s (Citoyen: %s)',
+            $this->id ?? 'nouveau',
+            $this->status,
+            $this->expiresAt ? $this->expiresAt->format('d/m/Y') : 'N/A',
+            $citizenName
+        );
+    }
 }
 

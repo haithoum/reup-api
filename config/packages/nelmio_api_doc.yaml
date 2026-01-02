@@ -1,0 +1,18 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: ReUp API
+            description: 'API de la plateforme ReUp - Économie circulaire pour le pain sec'
+            version: 1.0.0
+        components:
+            securitySchemes:
+                bearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - bearerAuth: []
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$)
+

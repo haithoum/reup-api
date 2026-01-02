@@ -39,15 +39,28 @@ class Recovery
     #[Assert\Positive]
     private ?string $qtyKg = null;
 
+    #[ORM\Column(type: 'decimal', precision: 8, scale: 2, nullable: true)]
+    #[Assert\Positive]
+    private ?string $actualQtyKg = null;
+
     #[ORM\Column(length: 20, options: ['default' => 'PENDING'])]
-    #[Assert\Choice(choices: ['PENDING', 'COMPLETED', 'CANCELLED'])]
+    #[Assert\Choice(choices: ['PENDING', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])]
     private string $status = 'PENDING';
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $scheduledAt = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $startedAt = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $completedAt = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $cancelledAt = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $cancellationReason = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notes = null;
@@ -238,6 +251,99 @@ class Recovery
     public function isCancelled(): bool
     {
         return $this->status === 'CANCELLED';
+    }
+
+    public function getActualQtyKg(): ?string
+    {
+        return $this->actualQtyKg;
+    }
+
+    public function setActualQtyKg(?string $actualQtyKg): self
+    {
+        $this->actualQtyKg = $actualQtyKg;
+        return $this;
+    }
+
+    public function getStartedAt(): ?\DateTimeInterface
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(?\DateTimeInterface $startedAt): self
+    {
+        $this->startedAt = $startedAt;
+        return $this;
+    }
+
+    public function getCancelledAt(): ?\DateTimeInterface
+    {
+        return $this->cancelledAt;
+    }
+
+    public function setCancelledAt(?\DateTimeInterface $cancelledAt): self
+    {
+        $this->cancelledAt = $cancelledAt;
+        return $this;
+    }
+
+    public function getCancellationReason(): ?string
+    {
+        return $this->cancellationReason;
+    }
+
+    public function setCancellationReason(?string $cancellationReason): self
+    {
+        $this->cancellationReason = $cancellationReason;
+        return $this;
+    }
+
+    // Alias methods for API compatibility
+    public function getPlannedWeightKg(): ?string
+    {
+        return $this->qtyKg;
+    }
+
+    public function setPlannedWeightKg(string $weightKg): self
+    {
+        $this->qtyKg = $weightKg;
+        return $this;
+    }
+
+    public function getActualWeightKg(): ?string
+    {
+        return $this->actualQtyKg;
+    }
+
+    public function setActualWeightKg(?string $weightKg): self
+    {
+        $this->actualQtyKg = $weightKg;
+        return $this;
+    }
+
+    public function getPlannedDate(): ?\DateTimeInterface
+    {
+        return $this->scheduledAt;
+    }
+
+    public function setPlannedDate(?\DateTimeInterface $date): self
+    {
+        $this->scheduledAt = $date;
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        $proName = $this->proUser ? $this->proUser->getEmail() : 'N/A';
+        $merchantName = $this->merchantUser ? $this->merchantUser->getEmail() : 'N/A';
+
+        return sprintf(
+            'Récupération #%s - %s kg - %s (Pro: %s, Commerçant: %s)',
+            $this->id ?? 'nouvelle',
+            $this->qtyKg ?? '0',
+            $this->status,
+            $proName,
+            $merchantName
+        );
     }
 }
 

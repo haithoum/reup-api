@@ -51,10 +51,14 @@ class City
     #[ORM\OneToMany(mappedBy: 'addressCity', targetEntity: MerchantProfile::class)]
     private Collection $merchantProfiles;
 
+    #[ORM\OneToMany(mappedBy: 'addressCity', targetEntity: ProProfile::class)]
+    private Collection $proProfiles;
+
     public function __construct()
     {
         $this->citizenProfiles = new ArrayCollection();
         $this->merchantProfiles = new ArrayCollection();
+        $this->proProfiles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +151,20 @@ class City
     public function getMerchantProfiles(): Collection
     {
         return $this->merchantProfiles;
+    }
+
+    public function getProProfiles(): Collection
+    {
+        return $this->proProfiles;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s (%s)',
+            $this->name ?? 'Ville sans nom',
+            $this->postalCode ?? 'N/A'
+        );
     }
 }
 

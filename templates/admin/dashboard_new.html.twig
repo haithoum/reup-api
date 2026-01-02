@@ -1,0 +1,512 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Tableau de bord ReUp{% endblock %}
+
+{% block content_title %}
+    <i class="fas fa-chart-line"></i> Tableau de bord ReUp
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Style général */
+        body {
+            background: #f8f9fa;
+        }
+
+        /* Fix pour le header du titre - alignement parfait */
+        .content-header {
+            background: white !important;
+            margin: 0 !important;
+            padding: 1.25rem 1.5rem !important;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .content-header-title {
+            font-size: 22px !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.2 !important;
+        }
+
+        /* Container principal - ajuster le padding */
+        .content {
+            padding: 0 !important;
+        }
+
+        .content-wrapper {
+            padding: 0 !important;
+        }
+
+        .content-body {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        /* Cartes statistiques */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.primary {
+            border-color: #5A67D8;
+            background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+        }
+
+        .stat-card.success {
+            border-color: #48BB78;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+
+        .stat-card.info {
+            border-color: #4299E1;
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+        }
+
+        .stat-card.warning {
+            border-color: #ED8936;
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+        }
+
+        .stat-card.danger {
+            border-color: #F56565;
+            background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+        }
+
+        /* Labels des statistiques */
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label i {
+            font-size: 16px;
+        }
+
+        /* Nombres des statistiques */
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 8px 0;
+            line-height: 1;
+        }
+
+        /* Sous-texte */
+        .stat-card small {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Cartes de graphiques */
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .chart-card h5 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-card h5 i {
+            color: #5A67D8;
+        }
+
+        /* Container des graphiques */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Listes Top 10 */
+        .list-group-item {
+            border: none;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 16px;
+            transition: background 0.2s ease;
+        }
+
+        .list-group-item:hover {
+            background: #f8fafc;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-group-item strong {
+            color: #1e293b;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .list-group-item small {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+        }
+
+        /* Titre de la page */
+        .content-header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Espacements */
+        .container-fluid {
+            padding: 24px;
+        }
+
+        /* Fix du wrapper principal EasyAdmin */
+        .content-wrapper {
+            padding: 0 !important;
+        }
+
+        .content {
+            padding: 0 !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid px-4">
+
+        <!-- KPIs Row 1 -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card primary">
+                    <div class="stat-label">
+                        <i class="fas fa-users"></i>
+                        <span>Total Utilisateurs</span>
+                    </div>
+                    <h2 class="stat-number">{{ globalStats.users.total ?? 0 }}</h2>
+                    <small class="text-muted">{{ globalStats.users.active ?? 0 }} utilisateurs actifs</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card success">
+                    <div class="stat-label">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Total Dépôts</span>
+                    </div>
+                    <h2 class="stat-number">{{ globalStats.deposits.total_deposits ?? 0 }}</h2>
+                    <small class="text-muted">{{ (globalStats.deposits.total_weight_kg ?? 0)|number_format(2) }} kg collectés</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card info">
+                    <div class="stat-label">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Total Récupérations</span>
+                    </div>
+                    <h2 class="stat-number">{{ globalStats.recoveries.total_recoveries ?? 0 }}</h2>
+                    <small class="text-muted">{{ (globalStats.recoveries.total_weight_recovered_kg ?? 0)|number_format(2) }} kg récupérés</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs Row 2 -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card warning">
+                    <div class="stat-label">
+                        <i class="fas fa-boxes"></i>
+                        <span>Stock Actuel</span>
+                    </div>
+                    <h2 class="stat-number">{{ (globalStats.stock.total_stock_kg ?? 0)|number_format(0) }}</h2>
+                    <small class="text-muted">{{ globalStats.stock.merchants_with_stock ?? 0 }} commerçants avec stock</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card success">
+                    <div class="stat-label">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Coupons</span>
+                    </div>
+                    <h2 class="stat-number">{{ globalStats.coupons.total_coupons ?? 0 }}</h2>
+                    <small class="text-muted">{{ globalStats.coupons.available_coupons ?? 0 }} coupons disponibles</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card danger">
+                    <div class="stat-label">
+                        <i class="fas fa-clock"></i>
+                        <span>En Attente de Validation</span>
+                    </div>
+                    <h2 class="stat-number">{{ globalStats.pending_validations.total ?? 0 }}</h2>
+                    <small class="text-muted">{{ globalStats.pending_validations.merchants ?? 0 }} commerçants, {{ globalStats.pending_validations.pros ?? 0 }} pros</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="row mt-4">
+            <div class="col-lg-8">
+                <div class="chart-card">
+                    <h5><i class="fas fa-chart-line"></i> Activité des 30 derniers jours</h5>
+                    <div class="chart-container">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-card">
+                    <h5><i class="fas fa-chart-pie"></i> Répartition des utilisateurs</h5>
+                    <div class="chart-container">
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5><i class="fas fa-chart-bar"></i> Commerçants par catégorie</h5>
+                    <div class="chart-container">
+                        <canvas id="merchantsCategoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5><i class="fas fa-chart-area"></i> Évolution des coupons (30 jours)</h5>
+                    <div class="chart-container">
+                        <canvas id="couponsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Lists -->
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5 class="mb-3"><i class="fas fa-trophy text-success"></i> Top 10 Commerçants</h5>
+                    {% if topMerchants is empty %}
+                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                    {% else %}
+                        <div class="list-group">
+                            {% for merchant in topMerchants %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ loop.index }}. {{ merchant.shop_name }}</strong><br>
+                                    <small class="text-muted">{{ merchant.total_deposits }} dépôts</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">{{ merchant.total_collected_kg|number_format(2) }} kg</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-card">
+                    <h5 class="mb-3"><i class="fas fa-star text-primary"></i> Top 10 Citoyens</h5>
+                    {% if topCitizens is empty %}
+                        <p class="text-muted text-center">Aucune donnée disponible</p>
+                    {% else %}
+                        <div class="list-group">
+                            {% for citizen in topCitizens %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ loop.index }}. {{ citizen.first_name }} {{ citizen.last_name }}</strong><br>
+                                    <small class="text-muted">{{ citizen.total_deposits }} dépôts</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ citizen.total_deposited_kg|number_format(2) }} kg</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        console.log('🚀 Initialisation des graphiques...');
+
+        // Configuration Chart.js
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial';
+        }
+
+        // Graphique d'activité
+        const activityChartElement = document.getElementById('activityChart');
+        if (activityChartElement) {
+            const activityCtx = activityChartElement.getContext('2d');
+            const depositsData = {{ last30DaysStats.deposits|default([])|json_encode|raw }};
+            const recoveriesData = {{ last30DaysStats.recoveries|default([])|json_encode|raw }};
+
+            const activityLabels = depositsData.map(d => d.date);
+            new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: activityLabels,
+                    datasets: [
+                        {
+                            label: 'Dépôts (kg)',
+                            data: depositsData.map(d => d.total_weight_kg),
+                            borderColor: 'rgb(46, 204, 113)',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Récupérations (kg)',
+                            data: recoveriesData.map(d => d.total_weight_kg),
+                            borderColor: 'rgb(52, 152, 219)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            console.log('✅ Graphique activité créé');
+        }
+
+        // Graphique utilisateurs
+        const usersChartElement = document.getElementById('usersChart');
+        if (usersChartElement) {
+            const usersCtx = usersChartElement.getContext('2d');
+            const usersData = {{ globalStats.users.by_role|default({})|json_encode|raw }};
+            new Chart(usersCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(usersData).map(role => role.replace('ROLE_', '')),
+                    datasets: [{
+                        data: Object.values(usersData).map(stat => stat.total),
+                        backgroundColor: ['rgba(52, 152, 219, 0.8)', 'rgba(46, 204, 113, 0.8)', 'rgba(243, 156, 18, 0.8)', 'rgba(231, 76, 60, 0.8)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            console.log('✅ Graphique utilisateurs créé');
+        }
+
+        // Graphique commerçants par catégorie
+        const merchantsCategoryChartElement = document.getElementById('merchantsCategoryChart');
+        if (merchantsCategoryChartElement) {
+            const merchantsCategoryCtx = merchantsCategoryChartElement.getContext('2d');
+            const merchantsCategoryData = {{ merchantsByCategory|default([])|json_encode|raw }};
+            new Chart(merchantsCategoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: merchantsCategoryData.map(m => m.category_name),
+                    datasets: [{
+                        label: 'Nombre de commerçants',
+                        data: merchantsCategoryData.map(m => m.merchant_count),
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+            console.log('✅ Graphique commerçants créé');
+        }
+
+        // Graphique coupons
+        const couponsChartElement = document.getElementById('couponsChart');
+        if (couponsChartElement) {
+            const couponsCtx = couponsChartElement.getContext('2d');
+            const couponsData = {{ last30DaysStats.coupons_redeemed|default([])|json_encode|raw }};
+            new Chart(couponsCtx, {
+                type: 'line',
+                data: {
+                    labels: couponsData.map(c => c.date),
+                    datasets: [{
+                        label: 'Coupons utilisés',
+                        data: couponsData.map(c => c.count),
+                        borderColor: 'rgb(26, 188, 156)',
+                        backgroundColor: 'rgba(26, 188, 156, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+            console.log('✅ Graphique coupons créé');
+        }
+
+        console.log('🎉 Tous les graphiques initialisés');
+    </script>
+{% endblock %}
+

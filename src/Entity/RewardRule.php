@@ -308,5 +308,15 @@ class RewardRule
 
         return $this->isActive;
     }
+
+    public function __toString(): string
+    {
+        return sprintf(
+            '%s (%s) - Seuil: %s kg',
+            $this->name ?? 'Règle sans nom',
+            $this->scope ?? 'N/A',
+            $this->thresholdKg ?? '0'
+        );
+    }
 }
 
